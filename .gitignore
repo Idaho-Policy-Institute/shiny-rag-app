@@ -1,0 +1,7 @@
+# .gitignore file
+.Renviron
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.duckdb
