@@ -29,7 +29,37 @@ RUN R -e "install.packages('ragnar', dependencies = TRUE, repos='https://cran.rs
 COPY . /srv/shiny-server/
 WORKDIR /srv/shiny-server/
 
-RUN curl -L -o ipi.ragnar.duckdb "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb"
+#Old option that worked, but didn't yield a 'valid database file'
+#RUN curl -L -o ipi.ragnar.duckdb "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb"
+
+# Test network connectivity first
+RUN curl -I "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb" || echo "HEAD request failed"
+
+# Download with verbose output and verification
+RUN curl -L -v --fail --retry 3 --retry-delay 5 \
+    -o ipi.ragnar.duckdb \
+    "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb" && \
+    echo "Download completed. File info:" && \
+    ls -la ipi.ragnar.duckdb && \
+    file ipi.ragnar.duckdb && \
+    echo "First few bytes:" && \
+    head -c 100 ipi.ragnar.duckdb | hexdump -C
+
+# Test database connectivity
+RUN R -e "
+  library(duckdb)
+  tryCatch({
+    con <- dbConnect(duckdb(), 'ipi.ragnar.duckdb')
+    cat('Successfully connected to database\\n')
+    tables <- dbListTables(con)
+    cat('Tables found:', paste(tables, collapse=', '), '\\n')
+    dbDisconnect(con)
+  }, error = function(e) {
+    cat('Database connection failed:', e\$message, '\\n')
+    # Don't quit, let's see what we downloaded
+  })
+"
+
 
 # Expose port
 EXPOSE 3838
