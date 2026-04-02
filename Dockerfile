@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install R packages one by one to catch errors
@@ -16,6 +17,7 @@ COPY . /srv/shiny-server/
 WORKDIR /srv/shiny-server/
 
 RUN curl -L -o ipi.ragnar.duckdb "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb"
+
 # Expose port
 EXPOSE 3838
 
