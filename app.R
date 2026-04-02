@@ -377,7 +377,9 @@ server <- function(input, output, session) {
     req <- request(base_url) |>
       req_headers(
         "Content-Type" = "application/json",
-        "X-API-Key" = api_key
+        "X-API-Key" = api_key,
+        "User-Agent" = "Mozilla/5.0 (compatible; ShinyApp)", #NEW
+        "Accept" = "application/json" #NEW
       ) |>
       req_body_json(list(
         modelId = model,
@@ -396,6 +398,18 @@ server <- function(input, output, session) {
   }
 
   custom_rag_chat <- function(query, store, system_prompt = "", n_chunks = 5) {
+    # Debug: Check if API key is available
+    if (is.null(api_key) || api_key == "") {
+      #NEW
+      return(list(
+        answer = "**[API Key Missing]** - The CUSTOM_AI_API_KEY environment variable is not set.",
+        context = NULL,
+        tokens_used = list(inputTokens = 0, outputTokens = 0)
+      ))
+    } #NEW
+
+    cat("API Key available:", !is.null(api_key) && nchar(api_key) > 0, "\n") #NEW
+
     retrieved_chunks <- ragnar_retrieve(store, text = query, n = n_chunks)
 
     context_text <- retrieved_chunks |>
@@ -497,8 +511,7 @@ server <- function(input, output, session) {
                 "Unable to process your question due to network restrictions. ",
                 "The app requires external API access that isn't available on this platform.\n\n",
                 "**Your question was:** ",
-                question,
-                api_key
+                question
               ),
               context = NULL,
               tokens_used = list(inputTokens = 0, outputTokens = 0)
