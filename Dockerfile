@@ -30,15 +30,7 @@ COPY . /srv/shiny-server/
 WORKDIR /srv/shiny-server/
 
 #Old option that worked, but didn't yield a 'valid database file'
-#RUN curl -L -o ipi.ragnar.duckdb "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb"
-
-# Use wget instead of curl - often works better with GitHub releases
-RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 3 \
-    --user-agent="Mozilla/5.0 (compatible; Docker)" \
-    -O ipi.ragnar.duckdb \
-    "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb" && \
-    ls -la ipi.ragnar.duckdb && \
-    echo "Database file downloaded successfully"
+RUN curl -L -o ipi.ragnar.duckdb "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb"
 
 # Expose port
 EXPOSE 3838
