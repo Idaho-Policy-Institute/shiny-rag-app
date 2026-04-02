@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev
 
 # Install R packages
-RUN R -e "install.packages(c('shiny', 'shinydashboard', 'DT', 'dplyr', 'httr2', 'ragnar'))"
+RUN R -e "install.packages(c('shiny', 'shinydashboard', 'DT', 'dplyr', 'httr2', 'ragnar', 'shinyWidgets', 'tidyverse', 'fs', 'glue', 'markdown'))"
 
 # Copy app files
 COPY . /srv/shiny-server/
