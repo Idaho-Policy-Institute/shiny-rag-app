@@ -8,16 +8,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install R packages one by one to catch errors
-RUN R -e "install.packages('ragnar', repos='https://cran.rstudio.com/')"
-RUN R -e "install.packages('shiny', repos='https://cran.rstudio.com/')"
-RUN R -e "install.packages('shinydashboard', repos='https://cran.rstudio.com/')"
-RUN R -e "install.packages('DT', repos='https://cran.rstudio.com/')"
-RUN R -e "install.packages('httr2', repos='https://cran.rstudio.com/')"
-RUN R -e "install.packages('shinyWidgets', repos='https://cran.rstudio.com/')"
-RUN R -e "install.packages('tidyverse', repos='https://cran.rstudio.com/')"
-RUN R -e "install.packages('fs', repos='https://cran.rstudio.com/')"
-RUN R -e "install.packages('glue', repos='https://cran.rstudio.com/')"
-RUN R -e "install.packages('markdown', repos='https://cran.rstudio.com/')"
+RUN R -e "install.packages(c('shiny', 'shinydashboard', 'shinyWidgets', 'DT', 'httr2', 'dplyr', 'stringr', 'readr', 'purrr', 'glue', 'markdown', 'ragnar'), repos='https://cran.rstudio.com/')"
+
 
 # Copy app files
 COPY . /srv/shiny-server/
