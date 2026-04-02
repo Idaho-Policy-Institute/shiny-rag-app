@@ -10,6 +10,7 @@ library(readr)
 library(purrr)
 library(glue)
 library(markdown)
+library(ragnar)
 
 #library(tidyverse)
 #library(ragnar)
