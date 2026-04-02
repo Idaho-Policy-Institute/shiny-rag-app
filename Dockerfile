@@ -28,8 +28,10 @@ RUN R -e "install.packages('ragnar', dependencies = TRUE, repos='https://cran.rs
 COPY . /srv/shiny-server/
 WORKDIR /srv/shiny-server/
 
-# Download database with better error handling and verification
+# Download database with better headers and user agent
 RUN curl -L --fail --retry 3 --retry-delay 5 \
+    -H "Accept: application/octet-stream" \
+    -H "User-Agent: Mozilla/5.0 (compatible; Docker)" \
     -o ipi.ragnar.duckdb \
     "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb" && \
     ls -la ipi.ragnar.duckdb && \
