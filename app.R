@@ -4,13 +4,18 @@ library(shinydashboard)
 library(shinyWidgets)
 library(DT)
 library(httr2)
-library(tidyverse)
+library(dplyr)
+library(stringr)
+library(readr)
+library(purrr)
+library(glue)
+library(markdown)
+
+#library(tidyverse)
 #library(ragnar)
 #library(ollamar)
 #library(ellmer)
 #library(fs)
-library(glue)
-library(markdown)
 
 # UI
 ui <- dashboardPage(
