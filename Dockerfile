@@ -6,10 +6,21 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libxml2-dev \
     curl \
+    build-essential \
+    cmake \
+    libsqlite3-dev \
+    libnng-dev \
+    pkg-config \
+    libssl-dev \
+    libsasl2-dev \
+    unixodbc-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install R packages one by one to catch errors
 RUN R -e "install.packages(c('shiny', 'shinydashboard', 'shinyWidgets', 'DT', 'httr2', 'dplyr', 'stringr', 'readr', 'purrr', 'glue', 'markdown'), repos='https://cran.rstudio.com/')"
+
+# Install ragnar dependencies first, then ragnar
+RUN R -e "install.packages(c('duckdb', 'nanonext', 'mirai'), repos='https://cran.rstudio.com/')"
 # Install ragnar separately and check if it installs
 RUN R -e "install.packages('ragnar', dependencies = TRUE, repos='https://cran.rstudio.com/'); library(ragnar); cat('ragnar loaded successfully\\n')"
 
