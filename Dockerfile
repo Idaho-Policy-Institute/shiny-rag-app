@@ -29,15 +29,7 @@ RUN R -e "install.packages('ragnar', dependencies = TRUE, repos='https://cran.rs
 COPY . /srv/shiny-server/
 WORKDIR /srv/shiny-server/
 
-# Replace the curl command with:
-RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 3 \
-    --header="Accept: application/octet-stream" \
-    --user-agent="Mozilla/5.0 (compatible; Docker)" \
-    -O ipi.ragnar.duckdb \
-    "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb" && \
-    ls -la ipi.ragnar.duckdb && \
-    file ipi.ragnar.duckdb
-
+RUN curl -L -o ipi.ragnar.duckdb "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb"
 
 # Expose port
 EXPOSE 3838
