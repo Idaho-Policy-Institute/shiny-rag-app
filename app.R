@@ -410,18 +410,41 @@ server <- function(input, output, session) {
       query
     )
 
-    response <- custom_anthropic_chat(
-      message = full_message,
-      model = "us.anthropic.claude-sonnet-4-20250514-v1:0",
-      base_url = "https://api.boisestate.ai/chat/api-converse",
-      api_key = api_key
-    )
+    # Try API call with fallback
+    tryCatch(
+      {
+        response <- custom_anthropic_chat(
+          message = full_message,
+          model = "us.anthropic.claude-sonnet-4-20250514-v1:0",
+          base_url = "https://api.boisestate.ai/chat/api-converse",
+          api_key = api_key
+        )
 
-    return(list(
-      answer = response$text,
-      context = retrieved_chunks,
-      tokens_used = response$usage
-    ))
+        return(list(
+          answer = response$text,
+          context = retrieved_chunks,
+          tokens_used = response$usage
+        ))
+      },
+      error = function(e) {
+        # Network blocked - return context only
+        fallback_answer <- paste0(
+          "**[Network Restriction - Showing Retrieved Context Only]**\n\n",
+          "The hosting platform blocks external API requests. Here's the relevant content I found:\n\n",
+          "---\n\n",
+          context_text,
+          "\n\n---\n\n",
+          "**Your Query:** ",
+          query
+        )
+
+        return(list(
+          answer = fallback_answer,
+          context = retrieved_chunks,
+          tokens_used = list(inputTokens = 0, outputTokens = 0)
+        ))
+      }
+    )
   }
 
   observeEvent(input$submit_question, {
