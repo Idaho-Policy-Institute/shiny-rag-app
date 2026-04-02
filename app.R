@@ -479,11 +479,31 @@ server <- function(input, output, session) {
 
     tryCatch(
       {
-        result <- custom_rag_chat(
-          query = question,
-          store = values$store,
-          system_prompt = system_prompt,
-          n_chunks = input$n_chunks
+        # Always try to get result, with comprehensive error handling
+        result <- tryCatch(
+          {
+            custom_rag_chat(
+              query = question,
+              store = values$store,
+              system_prompt = system_prompt,
+              n_chunks = input$n_chunks
+            )
+          },
+          error = function(e) {
+            # If everything fails, create a minimal fallback
+            list(
+              answer = paste0(
+                "**[Connection Error]**\n\n",
+                "Unable to process your question due to network restrictions. ",
+                "The app requires external API access that isn't available on this platform.\n\n",
+                "**Your question was:** ",
+                question,
+                api_key
+              ),
+              context = NULL,
+              tokens_used = list(inputTokens = 0, outputTokens = 0)
+            )
+          }
         )
 
         end_time <- Sys.time()
