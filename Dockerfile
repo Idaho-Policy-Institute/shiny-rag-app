@@ -36,18 +36,8 @@ RUN curl -L --fail --retry 3 --retry-delay 5 \
     file ipi.ragnar.duckdb
 
 # Verify the database file is valid
-RUN R -e "
-  library(duckdb)
-  tryCatch({
-    con <- dbConnect(duckdb(), 'ipi.ragnar.duckdb')
-    tables <- dbListTables(con)
-    dbDisconnect(con)
-    cat('Database verification successful. Tables:', paste(tables, collapse=', '), '\n')
-  }, error = function(e) {
-    cat('Database verification failed:', e$message, '\n')
-    quit(status = 1)
-  })
-"
+# Verify the database file is valid (simplified)
+RUN R -e "library(duckdb); con <- dbConnect(duckdb(), 'ipi.ragnar.duckdb'); tables <- dbListTables(con); dbDisconnect(con); cat('Database verification successful. Tables:', paste(tables, collapse=', '), '\\n')"
 # Expose port
 EXPOSE 3838
 
