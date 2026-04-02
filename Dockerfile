@@ -28,8 +28,26 @@ RUN R -e "install.packages('ragnar', dependencies = TRUE, repos='https://cran.rs
 COPY . /srv/shiny-server/
 WORKDIR /srv/shiny-server/
 
-RUN curl -L -o ipi.ragnar.duckdb "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb"
+# Download database with better error handling and verification
+RUN curl -L --fail --retry 3 --retry-delay 5 \
+    -o ipi.ragnar.duckdb \
+    "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb" && \
+    ls -la ipi.ragnar.duckdb && \
+    file ipi.ragnar.duckdb
 
+# Verify the database file is valid
+RUN R -e "
+  library(duckdb)
+  tryCatch({
+    con <- dbConnect(duckdb(), 'ipi.ragnar.duckdb')
+    tables <- dbListTables(con)
+    dbDisconnect(con)
+    cat('Database verification successful. Tables:', paste(tables, collapse=', '), '\n')
+  }, error = function(e) {
+    cat('Database verification failed:', e$message, '\n')
+    quit(status = 1)
+  })
+"
 # Expose port
 EXPOSE 3838
 
