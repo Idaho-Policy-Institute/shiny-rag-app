@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libxml2-dev \
     curl \
+    wget \
     build-essential \
     cmake \
     libsqlite3-dev \
@@ -28,18 +29,16 @@ RUN R -e "install.packages('ragnar', dependencies = TRUE, repos='https://cran.rs
 COPY . /srv/shiny-server/
 WORKDIR /srv/shiny-server/
 
-# Download database with better headers and user agent
-RUN curl -L --fail --retry 3 --retry-delay 5 \
-    -H "Accept: application/octet-stream" \
-    -H "User-Agent: Mozilla/5.0 (compatible; Docker)" \
-    -o ipi.ragnar.duckdb \
+# Replace the curl command with:
+RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 3 \
+    --header="Accept: application/octet-stream" \
+    --user-agent="Mozilla/5.0 (compatible; Docker)" \
+    -O ipi.ragnar.duckdb \
     "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi.ragnar.duckdb" && \
     ls -la ipi.ragnar.duckdb && \
     file ipi.ragnar.duckdb
 
-# Verify the database file is valid
-# Verify the database file is valid (simplified)
-RUN R -e "library(duckdb); con <- dbConnect(duckdb(), 'ipi.ragnar.duckdb'); tables <- dbListTables(con); dbDisconnect(con); cat('Database verification successful. Tables:', paste(tables, collapse=', '), '\\n')"
+
 # Expose port
 EXPOSE 3838
 
