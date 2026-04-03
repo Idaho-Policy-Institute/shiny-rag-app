@@ -453,6 +453,10 @@ server <- function(input, output, session) {
       query
     )
 
+    # Add debug output
+    cat("Full message length:", nchar(full_message), "\n")
+    cat("First 200 chars:", substr(full_message, 1, 200), "\n")
+
     # Try API call with fallback
     tryCatch(
       {
@@ -470,10 +474,16 @@ server <- function(input, output, session) {
         ))
       },
       error = function(e) {
+        # Log the detailed error
+        cat("Detailed API Error:", e$message, "\n")
+        cat("Error class:", class(e), "\n")
+
         # Network blocked - return context only
         fallback_answer <- paste0(
-          "**[Network Restriction - Showing Retrieved Context Only]**\n\n",
-          "The hosting platform blocks external API requests. Here's the relevant content I found:\n\n",
+          "**[API Error: ",
+          e$message,
+          "]**\n\n",
+          "Here's the relevant content I found:\n\n",
           "---\n\n",
           context_text,
           "\n\n---\n\n",
