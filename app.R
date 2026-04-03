@@ -340,23 +340,7 @@ server <- function(input, output, session) {
       ragnar_store_connect(store_location)
     })
 
-    tryCatch(
-      {
-        sample_retrieval <- ragnar_retrieve(store, text = "policy", n = 1)
-        cat(
-          "Connected to existing RAG store with",
-          nrow(sample_retrieval),
-          "or more documents\n"
-        )
-      },
-      error = function(e) {
-        cat(
-          "Connected to RAG store, but couldn't verify contents:",
-          e$message,
-          "\n"
-        )
-      }
-    )
+    cat("Connected to existing RAG store\n")
 
     files <- c("Existing documents in database")
     return(list(store = store, files = files))
