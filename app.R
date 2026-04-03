@@ -372,7 +372,14 @@ server <- function(input, output, session) {
       footer = NULL
     ))
 
-    test_api_connection()
+    # Test API connection and show result
+    api_test_result <- test_api_connection()
+    cat("API Test Result:", api_test_result, "\n")
+    showNotification(
+      paste("API Test:", api_test_result),
+      type = "warning",
+      duration = 10
+    )
 
     values$file_split_tbl <- read_csv("File_List.csv", show_col_types = FALSE)
 
