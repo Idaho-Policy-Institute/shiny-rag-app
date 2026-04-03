@@ -426,7 +426,7 @@ server <- function(input, output, session) {
     # Try the retrieval first, with error handling
     retrieved_chunks <- tryCatch(
       {
-        ragnar_retrieve(store, text = query, n = n_chunks)
+        ragnar_retrieve_vss(store, text = query, n = n_chunks)
       },
       error = function(e) {
         cat("Ragnar retrieve error:", e$message, "\n")
