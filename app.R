@@ -295,7 +295,39 @@ server <- function(input, output, session) {
   "
   )
 
-  # Replace your initialize_rag_store function with this:
+  test_api_connection <- function() {
+    #NEW
+    api_key <- Sys.getenv("CUSTOM_AI_API_KEY")
+
+    if (is.null(api_key) || api_key == "") {
+      return("API key not found")
+    }
+
+    tryCatch(
+      {
+        # Simple test request
+        req <- request("https://api.boisestate.ai/chat/api-converse") |>
+          req_headers(
+            "Content-Type" = "application/json",
+            "X-API-Key" = api_key
+          ) |>
+          req_body_json(list(
+            modelId = "us.anthropic.claude-sonnet-4-20250514-v1:0",
+            messages = list(list(
+              role = "user",
+              content = "Hello, this is a test."
+            ))
+          ))
+
+        resp <- req_perform(req)
+        return(paste("Success! Status:", resp_status(resp)))
+      },
+      error = function(e) {
+        return(paste("API Error:", e$message))
+      }
+    )
+  } #NEW
+
   initialize_rag_store <- function() {
     store_location <- "ipi.ragnar.duckdb"
 
@@ -339,6 +371,8 @@ server <- function(input, output, session) {
       "Connecting to existing document database...",
       footer = NULL
     ))
+
+    test_api_connection()
 
     values$file_split_tbl <- read_csv("File_List.csv", show_col_types = FALSE)
 
@@ -398,18 +432,6 @@ server <- function(input, output, session) {
   }
 
   custom_rag_chat <- function(query, store, system_prompt = "", n_chunks = 5) {
-    # Debug: Check if API key is available
-    if (is.null(api_key) || api_key == "") {
-      #NEW
-      return(list(
-        answer = "**[API Key Missing]** - The CUSTOM_AI_API_KEY environment variable is not set.",
-        context = NULL,
-        tokens_used = list(inputTokens = 0, outputTokens = 0)
-      ))
-    } #NEW
-
-    cat("API Key available:", !is.null(api_key) && nchar(api_key) > 0, "\n") #NEW
-
     retrieved_chunks <- ragnar_retrieve(store, text = query, n = n_chunks)
 
     context_text <- retrieved_chunks |>
