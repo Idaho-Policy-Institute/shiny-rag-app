@@ -423,7 +423,21 @@ server <- function(input, output, session) {
   }
 
   custom_rag_chat <- function(query, store, system_prompt = "", n_chunks = 5) {
-    retrieved_chunks <- ragnar_retrieve(store, text = query, n = n_chunks)
+    # Try the retrieval first, with error handling
+    retrieved_chunks <- tryCatch(
+      {
+        ragnar_retrieve(store, text = query, n = n_chunks)
+      },
+      error = function(e) {
+        cat("Ragnar retrieve error:", e$message, "\n")
+        # Return empty result if retrieval fails
+        return(data.frame(
+          text = "No documents could be retrieved due to network restrictions.",
+          origin = "system",
+          stringsAsFactors = FALSE
+        ))
+      }
+    )
 
     context_text <- retrieved_chunks |>
       dplyr::pull(text) |>
