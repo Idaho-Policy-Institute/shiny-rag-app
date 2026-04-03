@@ -4,18 +4,19 @@ FROM rocker/shiny:4.3.0
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
-    #libxml2-dev \
     curl \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+    #libxml2-dev \
     #wget \
     #build-essential \
     #cmake \
-    libsqlite3-dev \
     #libnng-dev \
     #pkg-config \
     #libssl-dev \
     #libsasl2-dev \
     #unixodbc-dev \
-    && rm -rf /var/lib/apt/lists/*
 
 # Install Ollama
 RUN curl -fsSL https://ollama.com/install.sh | sh
@@ -41,7 +42,6 @@ ollama serve &\n\
 sleep 10\n\
 echo "Pulling nomic-embed-text:latest model..."\n\
 ollama pull nomic-embed-text:latest\n\
-ollama serve
 echo "Model ready. Starting Shiny app..."\n\
 R -e "shiny::runApp(host='\''0.0.0.0'\'', port=3838)"\n' > /start.sh && \
     chmod +x /start.sh
