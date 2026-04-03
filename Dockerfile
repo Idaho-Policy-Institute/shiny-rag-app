@@ -8,9 +8,10 @@ RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     libnng-dev \
     pkg-config \
-    libssl-dev \
     libsasl2-dev \
     unixodbc-dev \
+    build-essential \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 # Install R packages one by one to catch errors
