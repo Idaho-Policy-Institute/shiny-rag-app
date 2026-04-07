@@ -423,25 +423,47 @@ server <- function(input, output, session) {
   }
 
   custom_rag_chat <- function(query, store, system_prompt = "", n_chunks = 5) {
+    # Add debug output
+    cat("Starting retrieval for query:", query, "\n")
+    cat("Store object exists:", !is.null(store), "\n")
+    cat("Store class:", class(store), "\n")
+
     # Try the retrieval first, with error handling
     retrieved_chunks <- tryCatch(
       {
-        ragnar_retrieve_vss(store, query = query, n = n_chunks)
+        cat("Attempting ragnar_retrieve_vss...\n")
+        result <- ragnar_retrieve_vss(store, query = query, n = n_chunks)
+        cat("Retrieval successful! Got", nrow(result), "chunks\n")
+        cat("Column names:", paste(names(result), collapse = ", "), "\n")
+        return(result)
       },
       error = function(e) {
         cat("Ragnar retrieve error:", e$message, "\n")
+        cat("Error class:", class(e), "\n")
         # Return empty result if retrieval fails
         return(data.frame(
-          text = "No documents could be retrieved due to network restrictions.",
+          text = paste("Retrieval failed:", e$message),
           origin = "system",
           stringsAsFactors = FALSE
         ))
       }
     )
 
+    # Check if we got valid results
+    if (nrow(retrieved_chunks) == 0 || is.null(retrieved_chunks$text)) {
+      cat("No valid chunks retrieved\n")
+      return(list(
+        answer = "**[No Documents Found]**\n\nNo relevant documents could be found for your query. Please try rephrasing your question or using different keywords.",
+        context = NULL,
+        tokens_used = list(inputTokens = 0, outputTokens = 0)
+      ))
+    }
+
     context_text <- retrieved_chunks |>
       dplyr::pull(text) |>
       paste(collapse = "\n\n---\n\n")
+
+    cat("Context text length:", nchar(context_text), "\n")
 
     full_message <- paste(
       system_prompt,
