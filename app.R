@@ -329,16 +329,18 @@ server <- function(input, output, session) {
   } #NEW
 
   initialize_rag_store <- function() {
-    store_location <- "ipi.ragnar.duckdb"
+    store_location <- "ipi_no_embed.ragnar.duckdb"
 
     if (!file.exists(store_location)) {
-      stop("Database file 'ipi.ragnar.duckdb' not found in current directory.")
+      stop("Database file not found in current directory.")
     }
 
     # Use isolate() to prevent reactive context issues
-    store <- isolate({
-      ragnar_store_connect(store_location)
-    })
+    #store <- isolate({
+    #  ragnar_store_connect(store_location)
+    #})
+
+    store = ragnar_store_connect(store_location)
 
     cat("Connected to existing RAG store\n")
 
@@ -348,7 +350,10 @@ server <- function(input, output, session) {
 
   observe({
     # This will run once when the app starts
-    req(is.null(values$store))
+    #req(is.null(values$store))
+    if (!is.null(values$store)) {
+      return()
+    }
 
     showModal(modalDialog(
       title = "Connecting...",
@@ -370,7 +375,8 @@ server <- function(input, output, session) {
     # Use isolate to prevent reactivity issues
     result <- tryCatch(
       {
-        isolate(initialize_rag_store())
+        #isolate(initialize_rag_store())
+        initialize_rag_store()
       },
       error = function(e) {
         list(error = e$message)
@@ -422,7 +428,12 @@ server <- function(input, output, session) {
     return(resp_body_json(resp))
   }
 
-  custom_rag_chat <- function(query, store, system_prompt = "", n_chunks = 5) {
+  custom_rag_chat <- function(
+    query,
+    store,
+    system_prompt = "",
+    n_chunks = 5
+  ) {
     # Add debug output
     cat("Starting retrieval for query:", query, "\n")
     cat("Store object exists:", !is.null(store), "\n")
@@ -432,20 +443,21 @@ server <- function(input, output, session) {
     retrieved_chunks <- tryCatch(
       {
         cat("Attempting ragnar_retrieve_vss...\n")
-        result <- ragnar_retrieve_vss(store, query = query, n = n_chunks)
+        #query = "TEST" #REMOVE THIS
+        result <- ragnar_retrieve_vss(store, query = query, top_k = n_chunks)
         cat("Retrieval successful! Got", nrow(result), "chunks\n")
         cat("Column names:", paste(names(result), collapse = ", "), "\n")
-        return(result)
+        result
       },
       error = function(e) {
         cat("Ragnar retrieve error:", e$message, "\n")
         cat("Error class:", class(e), "\n")
         # Return empty result if retrieval fails
-        return(data.frame(
+        data.frame(
           text = paste("Retrieval failed:", e$message),
           origin = "system",
           stringsAsFactors = FALSE
-        ))
+        )
       }
     )
 
@@ -527,6 +539,14 @@ server <- function(input, output, session) {
       return()
     }
 
+    # Validate n_chunks input - THIS IS THE KEY FIX
+    n_chunks_value <- input$n_chunks
+    if (
+      is.null(n_chunks_value) || is.na(n_chunks_value) || n_chunks_value <= 0
+    ) {
+      n_chunks_value <- 5 # Use default
+    }
+
     question <- trimws(input$user_question)
     start_time <- Sys.time()
 
@@ -559,7 +579,7 @@ server <- function(input, output, session) {
               query = question,
               store = values$store,
               system_prompt = system_prompt,
-              n_chunks = input$n_chunks
+              n_chunks = n_chunks_value
             )
           },
           error = function(e) {
