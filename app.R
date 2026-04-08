@@ -536,11 +536,33 @@ server <- function(input, output, session) {
   }
 
   observeEvent(input$submit_question, {
+    # Add debug checks at the very start
+    cat("=== SUBMIT BUTTON CLICKED ===\n")
+    cat("user_question:", input$user_question, "\n")
+    cat("n_chunks:", input$n_chunks, "\n")
+    cat("store exists:", !is.null(values$store), "\n")
+    cat(
+      "API keys exist:",
+      !is.null(Sys.getenv("CUSTOM_AI_API_KEY")) &&
+        Sys.getenv("GEMINI_API_KEY") != "",
+      "\n"
+    )
+    cat(
+      "BSU API key value:",
+      substr(Sys.getenv("CUSTOM_AI_API_KEY"), 1, 8),
+      "...\n"
+    )
+    cat(
+      "Gemini key value:",
+      substr(Sys.getenv("GEMINI_API_KEY"), 1, 8),
+      "...\n"
+    )
+
     req(input$user_question, values$store)
 
-    if (nchar(trimws(input$user_question)) == 0) {
-      return()
-    }
+    # if (nchar(trimws(input$user_question)) == 0) {
+    #   return()
+    # }
 
     # Validate n_chunks input - THIS IS THE KEY FIX
     n_chunks_value <- input$n_chunks
