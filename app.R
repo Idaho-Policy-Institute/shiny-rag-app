@@ -538,6 +538,7 @@ server <- function(input, output, session) {
   observeEvent(input$submit_question, {
     # Add debug checks at the very start
     cat("=== SUBMIT BUTTON CLICKED ===\n")
+    showNotification("Button clicked!", type = "message", duration = 3)
     cat("user_question:", input$user_question, "\n")
     cat("n_chunks:", input$n_chunks, "\n")
     cat("store exists:", !is.null(values$store), "\n")
