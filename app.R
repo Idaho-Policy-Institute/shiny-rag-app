@@ -271,6 +271,7 @@ server <- function(input, output, session) {
   }
 
   api_key <- Sys.getenv("CUSTOM_AI_API_KEY")
+  #gemini_api_key = Sys.getenv("GEMINI_API_KEY")
 
   system_prompt <- str_squish(
     "
@@ -329,7 +330,7 @@ server <- function(input, output, session) {
   } #NEW
 
   initialize_rag_store <- function() {
-    store_location <- "ipi_no_embed.ragnar.duckdb"
+    store_location <- "ipi_gemini.ragnar.duckdb"
 
     if (!file.exists(store_location)) {
       stop("Database file not found in current directory.")
@@ -340,7 +341,9 @@ server <- function(input, output, session) {
     #  ragnar_store_connect(store_location)
     #})
 
-    store = ragnar_store_connect(store_location)
+    store = ragnar_store_connect(
+      store_location
+    )
 
     cat("Connected to existing RAG store\n")
 
@@ -444,7 +447,7 @@ server <- function(input, output, session) {
       {
         cat("Attempting ragnar_retrieve_vss...\n")
         #query = "TEST" #REMOVE THIS
-        result <- ragnar_retrieve_vss(store, query = query, top_k = n_chunks)
+        result <- ragnar_retrieve(store, text = query, top_k = n_chunks)
         cat("Retrieval successful! Got", nrow(result), "chunks\n")
         cat("Column names:", paste(names(result), collapse = ", "), "\n")
         result
