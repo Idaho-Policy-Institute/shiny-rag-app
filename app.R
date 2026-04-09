@@ -296,6 +296,35 @@ server <- function(input, output, session) {
   "
   )
 
+  test_openai_connection <- function() {
+    openai_key <- Sys.getenv("OPENAI_API_KEY")
+
+    if (is.null(openai_key) || openai_key == "") {
+      return("OpenAI API key not found")
+    }
+
+    tryCatch(
+      {
+        # Test OpenAI embeddings endpoint directly
+        req <- request("https://api.openai.com/v1/embeddings") |>
+          req_headers(
+            "Authorization" = paste("Bearer", openai_key),
+            "Content-Type" = "application/json"
+          ) |>
+          req_body_json(list(
+            input = "test",
+            model = "text-embedding-ada-002"
+          ))
+
+        resp <- req_perform(req)
+        return(paste("OpenAI API accessible! Status:", resp_status(resp)))
+      },
+      error = function(e) {
+        return(paste("OpenAI API failed:", e$message))
+      }
+    )
+  }
+
   test_api_connection <- function() {
     #NEW
     api_key <- Sys.getenv("CUSTOM_AI_API_KEY")
@@ -372,6 +401,9 @@ server <- function(input, output, session) {
       type = "warning",
       duration = 10
     )
+
+    open_ai_api_test_result = test_openai_connection()
+    cat("OPENAI Test Result:", open_ai_api_test_result, "\n")
 
     values$file_split_tbl <- read_csv("File_List.csv", show_col_types = FALSE)
 
