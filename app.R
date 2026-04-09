@@ -501,8 +501,40 @@ server <- function(input, output, session) {
     retrieved_chunks <- tryCatch(
       {
         cat("Attempting to retrieve files...\n")
-        question = query
-        result <- ragnar_retrieve(store, question) #, top_k = n_chunks)
+
+        #question = query
+        #result <- ragnar_retrieve(store, question) #, top_k = n_chunks)
+        # Try different parameter names that might work
+        result <- tryCatch(
+          {
+            ragnar_retrieve(store, text = query, top_k = n_chunks)
+          },
+          error = function(e1) {
+            tryCatch(
+              {
+                ragnar_retrieve(store, query = query, top_k = n_chunks)
+              },
+              error = function(e2) {
+                tryCatch(
+                  {
+                    ragnar_retrieve(store, text = query, n = n_chunks)
+                  },
+                  error = function(e3) {
+                    stop(paste(
+                      "All parameter combinations failed:",
+                      e1$message,
+                      "|",
+                      e2$message,
+                      "|",
+                      e3$message
+                    ))
+                  }
+                )
+              }
+            )
+          }
+        )
+
         cat("Retrieval successful! Got", nrow(result), "chunks\n")
         cat("Column names:", paste(names(result), collapse = ", "), "\n")
         result
