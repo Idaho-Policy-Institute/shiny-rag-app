@@ -511,19 +511,18 @@ server <- function(input, output, session) {
         # Force garbage collection
         gc(verbose = TRUE)
 
-        # Try with a smaller top_k first
-        if (n_chunks > 3) {
-          cat(
-            "Reducing n_chunks from",
-            n_chunks,
-            "to 3 to test resource limits\n"
-          )
-          test_n_chunks <- 3
-        } else {
-          test_n_chunks <- n_chunks
-        }
+        # Use callr to run ragnar_retrieve in a separate process with timeout
+        library(processx)
 
-        result <- ragnar_retrieve(store, text = query, top_k = test_n_chunks)
+        result <- processx::r(
+          function(store_path, query_text, n_chunks) {
+            library(ragnar)
+            store <- ragnar_store_connect(store_path)
+            ragnar_retrieve(store, text = query_text, top_k = n_chunks)
+          },
+          args = list("ipi_openai.ragnar.duckdb", query, test_n_chunks),
+          timeout = 15 # 15 second timeout
+        )
 
         cat("Retrieval successful! Got", nrow(result), "chunks\n")
         result
