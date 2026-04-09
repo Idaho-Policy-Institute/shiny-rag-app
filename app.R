@@ -545,7 +545,7 @@ server <- function(input, output, session) {
     cat(
       "API keys exist:",
       !is.null(Sys.getenv("CUSTOM_AI_API_KEY")) &&
-        Sys.getenv("GEMINI_API_KEY") != "",
+        Sys.getenv("OPENAI_API_KEY") != "",
       "\n"
     )
     cat(
@@ -554,8 +554,8 @@ server <- function(input, output, session) {
       "...\n"
     )
     cat(
-      "Gemini key value:",
-      substr(Sys.getenv("GEMINI_API_KEY"), 1, 8),
+      "OpenAI key value:",
+      substr(Sys.getenv("OPENAI_API_KEY"), 1, 8),
       "...\n"
     )
 
