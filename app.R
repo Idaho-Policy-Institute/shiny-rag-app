@@ -512,15 +512,14 @@ server <- function(input, output, session) {
         gc(verbose = TRUE)
 
         # Use callr to run ragnar_retrieve in a separate process with timeout
-        library(processx)
+        library(callr)
 
-        result <- processx::r(
-          function(store_path, query_text, n_chunks) {
-            library(ragnar)
-            store <- ragnar_store_connect(store_path)
-            ragnar_retrieve(store, text = query_text, top_k = n_chunks)
+        result <- callr::r(
+          function(store_path, query, n_chunks) {
+            store <- ragnar::ragnar_store_connect(store_path)
+            ragnar::ragnar_retrieve(store, text = query, top_k = n_chunks)
           },
-          args = list("ipi_openai.ragnar.duckdb", query, test_n_chunks),
+          args = list("ipi_openai.ragnar.duckdb", query, n_chunks),
           timeout = 15 # 15 second timeout
         )
 

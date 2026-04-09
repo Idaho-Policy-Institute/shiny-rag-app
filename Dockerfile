@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 RUN R -e "install.packages(c('shiny', 'shinydashboard', 'shinyWidgets', 'DT', 'httr2', 'dplyr', 'stringr', 'readr', 'purrr', 'glue', 'markdown'), repos='https://cran.rstudio.com/')"
 
 # Install ragnar dependencies first, then ragnar
-RUN R -e "install.packages(c('duckdb', 'nanonext', 'mirai', 'rvest', 'xml2', 'processx'), repos='https://cran.rstudio.com/')"
+RUN R -e "install.packages(c('duckdb', 'nanonext', 'mirai', 'rvest', 'xml2', 'processx', 'callr'), repos='https://cran.rstudio.com/')"
 RUN R -e "install.packages('ragnar', dependencies = TRUE, repos='https://cran.rstudio.com/'); library(ragnar); cat('ragnar loaded successfully\\n')"
 
 # Copy app files
