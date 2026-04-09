@@ -501,42 +501,31 @@ server <- function(input, output, session) {
     retrieved_chunks <- tryCatch(
       {
         cat("Attempting to retrieve files...\n")
+        cat("Query:", query, "\n")
+        cat("n_chunks:", n_chunks, "\n")
 
-        #question = query
-        #result <- ragnar_retrieve(store, question) #, top_k = n_chunks)
-        # Try different parameter names that might work
-        result <- tryCatch(
-          {
-            ragnar_retrieve(store, text = query, top_k = n_chunks)
-          },
-          error = function(e1) {
-            tryCatch(
-              {
-                ragnar_retrieve(store, query = query, top_k = n_chunks)
-              },
-              error = function(e2) {
-                tryCatch(
-                  {
-                    ragnar_retrieve(store, text = query, n = n_chunks)
-                  },
-                  error = function(e3) {
-                    stop(paste(
-                      "All parameter combinations failed:",
-                      e1$message,
-                      "|",
-                      e2$message,
-                      "|",
-                      e3$message
-                    ))
-                  }
-                )
-              }
-            )
-          }
-        )
+        # Check system resources before the call
+        cat("Memory usage before call:\n")
+        print(gc())
+
+        # Force garbage collection
+        gc(verbose = TRUE)
+
+        # Try with a smaller top_k first
+        if (n_chunks > 3) {
+          cat(
+            "Reducing n_chunks from",
+            n_chunks,
+            "to 3 to test resource limits\n"
+          )
+          test_n_chunks <- 3
+        } else {
+          test_n_chunks <- n_chunks
+        }
+
+        result <- ragnar_retrieve(store, text = query, top_k = test_n_chunks)
 
         cat("Retrieval successful! Got", nrow(result), "chunks\n")
-        cat("Column names:", paste(names(result), collapse = ", "), "\n")
         result
       },
       error = function(e) {
