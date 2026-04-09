@@ -447,7 +447,7 @@ server <- function(input, output, session) {
       {
         cat("Attempting to retrieve files...\n")
         #query = "TEST" #REMOVE THIS
-        result <- ragnar_retrieve_vss(store, query = query, top_k = n_chunks)
+        result <- ragnar_retrieve(store, query = query, top_k = n_chunks)
         cat("Retrieval successful! Got", nrow(result), "chunks\n")
         cat("Column names:", paste(names(result), collapse = ", "), "\n")
         result
