@@ -271,7 +271,7 @@ server <- function(input, output, session) {
   }
 
   api_key <- Sys.getenv("CUSTOM_AI_API_KEY")
-  #gemini_api_key = Sys.getenv("GEMINI_API_KEY")
+  gemini_api_key = Sys.getenv("GEMINI_API_KEY")
 
   system_prompt <- str_squish(
     "
@@ -299,7 +299,6 @@ server <- function(input, output, session) {
   test_api_connection <- function() {
     #NEW
     api_key <- Sys.getenv("CUSTOM_AI_API_KEY")
-    gemini_api_key = Sys.getenv("GEMINI_API_KEY")
 
     if (is.null(api_key) || api_key == "") {
       return("API key not found")
