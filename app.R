@@ -542,22 +542,19 @@ server <- function(input, output, session) {
     cat("user_question:", input$user_question, "\n")
     cat("n_chunks:", input$n_chunks, "\n")
     cat("store exists:", !is.null(values$store), "\n")
+
+    # Check BOTH API keys individually
+    bsu_key <- Sys.getenv("CUSTOM_AI_API_KEY")
+    openai_key <- Sys.getenv("OPENAI_API_KEY")
+
+    cat("BSU API key exists:", !is.null(bsu_key) && bsu_key != "", "\n")
     cat(
-      "API keys exist:",
-      !is.null(Sys.getenv("CUSTOM_AI_API_KEY")) &&
-        Sys.getenv("OPENAI_API_KEY") != "",
+      "OpenAI API key exists:",
+      !is.null(openai_key) && openai_key != "",
       "\n"
     )
-    cat(
-      "BSU API key value:",
-      substr(Sys.getenv("CUSTOM_AI_API_KEY"), 1, 8),
-      "...\n"
-    )
-    cat(
-      "OpenAI key value:",
-      substr(Sys.getenv("OPENAI_API_KEY"), 1, 8),
-      "...\n"
-    )
+    cat("BSU API key value:", substr(bsu_key, 1, 8), "...\n")
+    cat("OpenAI key value:", substr(openai_key, 1, 8), "...\n")
 
     req(input$user_question, values$store)
 
