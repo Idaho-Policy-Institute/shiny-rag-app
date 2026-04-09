@@ -27,7 +27,7 @@ COPY . /srv/shiny-server/
 WORKDIR /srv/shiny-server/
 
 #Download database file
-RUN curl -L -o ipi_gemini.ragnar.duckdb "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi_gemini.ragnar.duckdb"
+RUN curl -L -o ipi_openai.ragnar.duckdb "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi_openai.ragnar.duckdb"
 
 # Expose port
 EXPOSE 3838

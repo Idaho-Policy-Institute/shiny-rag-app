@@ -271,7 +271,7 @@ server <- function(input, output, session) {
   }
 
   api_key <- Sys.getenv("CUSTOM_AI_API_KEY")
-  gemini_api_key = Sys.getenv("GEMINI_API_KEY")
+  #gemini_api_key = Sys.getenv("GEMINI_API_KEY")
 
   system_prompt <- str_squish(
     "
@@ -330,7 +330,7 @@ server <- function(input, output, session) {
   } #NEW
 
   initialize_rag_store <- function() {
-    store_location <- "ipi_gemini.ragnar.duckdb"
+    store_location <- "ipi_openai.ragnar.duckdb"
 
     if (!file.exists(store_location)) {
       stop("Database file not found in current directory.")
