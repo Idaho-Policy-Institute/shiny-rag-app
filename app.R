@@ -393,6 +393,29 @@ server <- function(input, output, session) {
       footer = NULL
     ))
 
+    # Debug: Check if ragnar is loaded and what functions are available
+    cat("Checking ragnar package...\n")
+    cat("ragnar loaded:", "package:ragnar" %in% search(), "\n")
+
+    if ("package:ragnar" %in% search()) {
+      ragnar_functions <- ls("package:ragnar")
+      retrieve_functions <- ragnar_functions[grepl(
+        "retrieve",
+        ragnar_functions,
+        ignore.case = TRUE
+      )]
+      cat(
+        "Available retrieve functions:",
+        paste(retrieve_functions, collapse = ", "),
+        "\n"
+      )
+
+      # Test if ragnar_retrieve function exists
+      cat("ragnar_retrieve exists:", exists("ragnar_retrieve"), "\n")
+    } else {
+      cat("ERROR: ragnar package not loaded!\n")
+    }
+
     # Test API connection and show result
     api_test_result <- test_api_connection()
     cat("API Test Result:", api_test_result, "\n")
