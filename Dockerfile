@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     libsqlite3-dev \
     libxml2-dev \
-    libmbedtls \
+    libmbedtls-dev \
     cmake \
     && rm -rf /var/lib/apt/lists/*
 
