@@ -453,7 +453,7 @@ server <- function(input, output, session) {
       "\n\n## Relevant Document Excerpts:\n",
       context_text,
       "\n\n## User Query:\n",
-      query
+      query_content
     )
 
     # Add debug output
@@ -491,7 +491,7 @@ server <- function(input, output, session) {
           context_text,
           "\n\n---\n\n",
           "**Your Query:** ",
-          query
+          query_content
         )
 
         return(list(
