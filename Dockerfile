@@ -7,6 +7,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     libsqlite3-dev \
     libxml2-dev \
+    libmbedtls \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 # Install R packages one by one to catch errors
