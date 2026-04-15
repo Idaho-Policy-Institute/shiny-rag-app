@@ -422,11 +422,16 @@ server <- function(input, output, session) {
     return(resp_body_json(resp))
   }
 
-  custom_rag_chat <- function(query, store, system_prompt = "", n_chunks = 5) {
+  custom_rag_chat <- function(
+    query_content,
+    store,
+    system_prompt = "",
+    n_chunks = 5
+  ) {
     # Try the retrieval first, with error handling
     retrieved_chunks <- tryCatch(
       {
-        ragnar_retrieve(store, query, n = n_chunks)
+        ragnar_retrieve(store, text = query_content, top_k = n_chunks)
       },
       error = function(e) {
         cat("Ragnar retrieve error:", e$message, "\n")
@@ -534,7 +539,7 @@ server <- function(input, output, session) {
         result <- tryCatch(
           {
             custom_rag_chat(
-              query = question,
+              query_content = question,
               store = values$store,
               system_prompt = system_prompt,
               n_chunks = input$n_chunks
