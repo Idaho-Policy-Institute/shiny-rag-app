@@ -443,11 +443,14 @@ server <- function(input, output, session) {
         ))
       }
     )
-
+    cat("Processing retrieved chunks \n")
     context_text <- retrieved_chunks |>
       dplyr::pull(text) |>
       paste(collapse = "\n\n---\n\n")
 
+    cat(
+      "Combining system prompt, processed data and user question into a message for the API \n"
+    )
     full_message <- paste(
       system_prompt,
       "\n\n## Relevant Document Excerpts:\n",
@@ -458,11 +461,16 @@ server <- function(input, output, session) {
 
     # Add debug output
     cat("Full message length:", nchar(full_message), "\n")
-    cat("First 200 chars:", substr(full_message, 1, 200), "\n")
+    cat(
+      "Last 200 chars:",
+      substr(full_message, nchar(full_message) - 200, nchar(full_message)),
+      "\n"
+    )
 
     # Try API call with fallback
     tryCatch(
       {
+        cat("Calling Boise State API \n")
         response <- custom_anthropic_chat(
           message = full_message,
           model = "us.anthropic.claude-sonnet-4-20250514-v1:0",
@@ -538,6 +546,7 @@ server <- function(input, output, session) {
         # Always try to get result, with comprehensive error handling
         result <- tryCatch(
           {
+            cat("Calling custom_rag_chat function \n")
             custom_rag_chat(
               query_content = question,
               store = values$store,
