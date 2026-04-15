@@ -431,7 +431,21 @@ server <- function(input, output, session) {
     # Try the retrieval first, with error handling
     retrieved_chunks <- tryCatch(
       {
-        ragnar_retrieve(store, text = query_content, top_k = n_chunks)
+        cat("Calling ragnar_retrieve \n")
+
+        # Run ragnar_retrieve in isolated process to prevent crashes
+        result <- callr::r(
+          function(store_path, query_text, n_chunks) {
+            library(ragnar)
+            store <- ragnar::ragnar_store_connect(store_path)
+            ragnar::ragnar_retrieve(store, text = query_text, top_k = n_chunks)
+          },
+          args = list("ipi_noembed.ragnar.duckdb", query_content, n_chunks),
+          timeout = 30 # 30 second timeout
+        )
+
+        cat("Retrieval successful! Got", nrow(result), "chunks\n")
+        result
       },
       error = function(e) {
         cat("Ragnar retrieve error:", e$message, "\n")
