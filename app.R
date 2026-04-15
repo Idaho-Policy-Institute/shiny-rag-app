@@ -329,7 +329,7 @@ server <- function(input, output, session) {
   } #NEW
 
   initialize_rag_store <- function() {
-    store_location <- "ipi.ragnar.duckdb"
+    store_location <- "ipi_noembed.ragnar.duckdb"
 
     if (!file.exists(store_location)) {
       stop("Database file 'ipi.ragnar.duckdb' not found in current directory.")
@@ -426,7 +426,7 @@ server <- function(input, output, session) {
     # Try the retrieval first, with error handling
     retrieved_chunks <- tryCatch(
       {
-        ragnar_retrieve_vss(store, text = query, n = n_chunks)
+        ragnar_retrieve(store, query, n = n_chunks)
       },
       error = function(e) {
         cat("Ragnar retrieve error:", e$message, "\n")
