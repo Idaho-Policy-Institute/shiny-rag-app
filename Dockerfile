@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
     cmake \
     build-essential \
     pkg-config \
+    git \
+    libgit2-dev \
+    libharfbuzz-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install R packages one by one to catch errors
