@@ -441,7 +441,7 @@ server <- function(input, output, session) {
             ragnar::ragnar_retrieve(store, text = query_text, top_k = n_chunks)
           },
           args = list("ipi_noembed.ragnar.duckdb", query_content, n_chunks),
-          timeout = 30 # 30 second timeout
+          timeout = 60 # 60 second timeout
         )
 
         cat("Retrieval successful! Got", nrow(result), "chunks\n")
