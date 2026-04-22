@@ -1,0 +1,50 @@
+# Git files
+.git/
+.gitignore
+*.md
+README.md
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# R project files
+*.Rproj
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# renv cache and local files (these will be rebuilt in Docker)
+renv/library/
+renv/staging/
+renv/local/
+renv/python/
+renv/sandbox/
+
+# System files
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*~
+*.swp
+*.swo
+
+# Large database files (if you're downloading them in Docker instead)
+*.duckdb
+
+# API keys and sensitive files (you should use environment variables instead)
+.env
+.Renviron
+
+# Build artifacts
+*.o
+*.so
+*.dll

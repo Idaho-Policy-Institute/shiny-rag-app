@@ -16,12 +16,20 @@ RUN apt-get clean && \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Install R packages one by one to catch errors
-RUN R -e "install.packages(c('shiny', 'shinydashboard', 'shinyWidgets', 'DT', 'httr2', 'dplyr', 'stringr', 'readr', 'purrr', 'glue', 'markdown', 'callr'), repos='https://cran.rstudio.com/')"
+# Install renv
+RUN R -e "install.packages('renv', repos='https://cran.rstudio.com/')"
 
-# Install ragnar dependencies first, then ragnar
-RUN R -e "install.packages(c('duckdb', 'nanonext', 'mirai', 'rvest' , 'xml2'), repos='https://cran.rstudio.com/')"
-RUN R -e "install.packages('ragnar', dependencies = TRUE, repos='https://cran.rstudio.com/'); library(ragnar); cat('ragnar loaded successfully\\n')"
+# Copy renv files first (for Docker layer caching)
+COPY renv.lock renv.lock
+COPY .Rprofile .Rprofile
+COPY renv/activate.R renv/activate.R
+
+# Set renv cache location
+ENV RENV_PATHS_CACHE=/opt/renv/cache
+RUN mkdir -p $RENV_PATHS_CACHE
+
+# Restore packages from renv.lock
+RUN R -e "renv::restore()"
 
 # Copy app files
 COPY . /srv/shiny-server/
