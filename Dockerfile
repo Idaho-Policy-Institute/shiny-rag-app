@@ -16,13 +16,14 @@ RUN apt-get clean && \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
+# Set working directory first
+WORKDIR /srv/shiny-server/
+
 # Install renv
 RUN R -e "install.packages('renv', repos='https://cran.rstudio.com/')"
 
-# Copy renv files first (for Docker layer caching)
-COPY renv.lock renv.lock
-COPY .Rprofile .Rprofile
-COPY renv/activate.R renv/activate.R
+# Copy ALL app files (including renv files) to the working directory
+COPY . .
 
 # Set renv cache location
 ENV RENV_PATHS_CACHE=/opt/renv/cache
