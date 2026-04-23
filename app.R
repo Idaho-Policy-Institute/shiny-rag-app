@@ -434,14 +434,32 @@ server <- function(input, output, session) {
         cat("Calling ragnar_retrieve \n")
 
         # Run ragnar_retrieve in isolated process to prevent crashes
+        # Pass environment variables to the callr process
         result <- callr::r(
-          function(store_path, query_text, n_chunks) {
+          function(store_path, query_text, n_chunks, api_keys) {
+            # Set environment variables in the isolated process
+            Sys.setenv(OPENAI_API_KEY = api_keys$openai_key)
+            Sys.setenv(CUSTOM_AI_API_KEY = api_keys$custom_key)
+
+            # Load renv in the isolated process
+            if (file.exists(".Rprofile")) {
+              source(".Rprofile")
+            }
+
             library(ragnar)
-            store <- ragnar::ragnar_store_connect(store_path)
-            ragnar::ragnar_retrieve(store, text = query_text, top_k = n_chunks)
+            store <- ragnar_store_connect(store_path)
+            ragnar_retrieve(store, text = query_text, top_k = n_chunks)
           },
-          args = list("ipi_noembed.ragnar.duckdb", query_content, n_chunks),
-          timeout = 60 # 60 second timeout
+          args = list(
+            "ipi_noembed.ragnar.duckdb",
+            query_content,
+            n_chunks,
+            list(
+              openai_key = Sys.getenv("OPENAI_API_KEY"),
+              custom_key = Sys.getenv("CUSTOM_AI_API_KEY")
+            )
+          ),
+          timeout = 60
         )
 
         cat("Retrieval successful! Got", nrow(result), "chunks\n")
