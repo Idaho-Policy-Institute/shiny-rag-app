@@ -1,4 +1,4 @@
-FROM rocker/shiny:4.3.0
+FROM rocker/shiny:latest
 
 # Install system dependencies
 RUN apt-get clean && \
