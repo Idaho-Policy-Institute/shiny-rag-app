@@ -32,10 +32,6 @@ RUN mkdir -p $RENV_PATHS_CACHE
 # Restore packages from renv.lock
 RUN R -e "renv::restore()"
 
-# Copy app files
-COPY . /srv/shiny-server/
-WORKDIR /srv/shiny-server/
-
 #Download database file
 RUN curl -L -o ipi_noembed.ragnar.duckdb "https://github.com/Idaho-Policy-Institute/shiny-rag-app/releases/download/v0.1-prototype/ipi_noembed.ragnar.duckdb"
 
